@@ -2,4 +2,5 @@
 .dapper
 coverage.out
 Dockerfile.dapper*
+go-common-libs-test
 

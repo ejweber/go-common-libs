@@ -161,6 +161,8 @@ func newJoiner(procDirectory string, timeout time.Duration) (nsjoin JoinerInterf
 	nsDir := proc.GetHostNamespaceDirectory(procDirectory)
 	procPid := proc.GetHostNamespacePID(procDirectory)
 
+	logrus.Warnf("nsDir: %v, procPID: %v", nsDir, procPid)
+
 	return &JoinerDescriptor{
 		directory: nsDir,
 		pid:       procPid,
@@ -233,6 +235,9 @@ func (jd *JoinerDescriptor) openAndRecordOriginalNamespaceFile(ns string, namesp
 // joined (e.g. /host/proc/123/ns/mnt)
 func (jd *JoinerDescriptor) openAndRecordTargetNamespaceFile(ns string, namespace types.Namespace) error {
 	namespaceFile := filepath.Join(jd.directory, ns)
+
+	logrus.Warnf("Namespace file: %v", namespaceFile)
+
 	targetFd, err := jd.target.OpenFile(namespaceFile)
 	if err != nil {
 		return errors.Wrapf(err, "failed to open namespace file %v", namespaceFile)
@@ -319,6 +324,9 @@ func (jd *JoinerDescriptor) Run(fn func() (interface{}, error)) (interface{}, er
 
 		// Join the target namespaces.
 		logrus.Trace("Joining target namespaces")
+		for _, target := range jd.target {
+			logrus.Warnf("Target: %v", target)
+		}
 		err = jd.Join()
 		if err != nil {
 			errCh <- err

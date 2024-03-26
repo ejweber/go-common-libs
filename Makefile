@@ -16,3 +16,10 @@ $(TARGETS): .dapper
 deps: .dapper
 	./.dapper -d -m bind go mod vendor
 	./.dapper -d -m bind chown -R $$(id -u) vendor go.mod go.sum
+
+.PHONY: go-common-libs-test
+go-common-libs-test:
+	go build -o go-common-libs-test
+	docker build .  -t go-common-libs-test
+	rm go-common-libs-test
+	docker run -it -v /:/host --privileged --name go-common-libs-test go-common-libs-test
