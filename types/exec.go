@@ -7,6 +7,7 @@ import (
 const (
 	BinaryCryptsetup = "cryptsetup"
 	BinaryFstrim     = "fstrim"
+	BinaryFsfreeze   = "fsfreeze"
 )
 
 const (
