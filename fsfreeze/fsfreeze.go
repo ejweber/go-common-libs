@@ -12,6 +12,12 @@ import (
 const (
 	binaryFsfreeze = "fsfreeze"
 	freezeTimeout  = 10 * time.Second // Workloads will not take kindly to long freezes. Fall back to sync.
+
+	// Testing shows that `fsfreeze -u` is immediately effective at re-allowing I/Os to flow to the disk. However, some
+	// fsfreeze related I/O must complete or fail before it returns. In certain situations (e.g. when it is executed
+	// during an instance-manager shutdown that has already stopped the associated replica so that I/Os will eventually
+	// time out), this can lead to unnecessary delays.
+	unfreezeTimeout = 1 * time.Second
 )
 
 func NewDiscardLogger() *logrus.Logger {
@@ -61,7 +67,7 @@ func AttemptUnfreezeFileSystem(freezePoint string, exec lhexec.ExecuteInterface,
 		log.Debugf("Unfreezing file system mounted at %v", freezePoint)
 	}
 
-	_, err := exec.Execute([]string{}, binaryFsfreeze, []string{"-u", freezePoint}, freezeTimeout)
+	_, err := exec.Execute([]string{}, binaryFsfreeze, []string{"-u", freezePoint}, unfreezeTimeout)
 	if err != nil && expectSuccess {
 		log.WithError(err).Warnf("Failed to unfreeze file system mounted at %v", freezePoint)
 	}
