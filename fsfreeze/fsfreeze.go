@@ -11,7 +11,11 @@ import (
 
 const (
 	binaryFsfreeze = "fsfreeze"
-	freezeTimeout  = 10 * time.Second // Workloads will not take kindly to long freezes. Fall back to sync.
+
+	// TODO: 10 seconds is NOT a good default. On some random Digital Ocean VM with default configuration, we are easily
+	// able to get 1 GiB of dirty pages in the cache. In that environment, it takes 14.5 seconds to complete the
+	// freeze.
+	freezeTimeout = 10 * time.Second // Workloads will not take kindly to long freezes. Fall back to sync.
 
 	// Testing shows that `fsfreeze -u` is immediately effective at re-allowing I/Os to flow to the disk. However, some
 	// fsfreeze related I/O must complete or fail before it returns. In certain situations (e.g. when it is executed
